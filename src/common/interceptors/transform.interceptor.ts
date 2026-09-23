@@ -5,7 +5,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { Observable, map } from 'rxjs';
+import { Observable, map, timestamp } from 'rxjs';
 import { ApiResponse } from '../interfaces/api-response.interface.js';
 
 // =============================================================================
@@ -26,18 +26,14 @@ import { ApiResponse } from '../interfaces/api-response.interface.js';
 // =============================================================================
 
 @Injectable()
-export class TransformInterceptor<T> implements NestInterceptor<
-  T,
-  ApiResponse<T>
-> {
+export class TransformInterceptor<T> implements NestInterceptor<T,ApiResponse<T>> {
   intercept(
     context: ExecutionContext,
     next: CallHandler<T>,
   ): Observable<ApiResponse<T>> {
-    // TODO [Estudiante 1] Paso 1: obtén el contexto HTTP.
-    //   const http = context.switchToHttp();
-    //   const request = http.getRequest<Request>();
-    //   const response = http.getResponse<Response>();
+    const http = context.switchToHttp();
+    const request = http.getRequest<Request>();
+    const response = http.getResponse<Response>();
 
     // TODO [Estudiante 1] Paso 2: "engancha" el flujo de la respuesta con
     //   next.handle().pipe( map((data) => ({ ... })) )
@@ -51,6 +47,13 @@ export class TransformInterceptor<T> implements NestInterceptor<
     // DENTRO del map() y no antes?
 
     // ⬇️ Reemplaza esta línea por tu implementación.
-    return next.handle() as unknown as Observable<ApiResponse<T>>;
+    return next.handle().pipe(
+      map((data)=> ({
+        statusCode: response.statusCode,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        data
+      }))
+    )
   }
 }

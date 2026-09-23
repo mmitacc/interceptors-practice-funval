@@ -54,8 +54,18 @@ export function configureApp(app: INestApplication): void {
   //   - .setContact('Equipo X', '', 'equipo@example.com')
   //   Bonus: en SwaggerModule.setup pasa { customSiteTitle: 'Orders API Docs' }.
   // ---------------------------------------------------------------------------
-  const config = new DocumentBuilder().build();
+const config = new DocumentBuilder()
+  .setTitle('Orders & Products API')
+  .setDescription(
+    'API para la gestión de pedidos y productos de una tienda online. ' +
+      'Las respuestas de la API utilizan un formato estándar.',
+  )
+  .setVersion('1.0')
+  .addTag('orders', 'Gestión de pedidos')
+  .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
-}
+const document = SwaggerModule.createDocument(app, config);
+
+SwaggerModule.setup('docs', app, document, {
+  customSiteTitle: 'Orders API Docs',
+})};
