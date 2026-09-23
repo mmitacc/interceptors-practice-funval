@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { OrdersService } from './orders.service.js';
+import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 
 // =============================================================================
 // OrdersController
@@ -29,11 +30,14 @@ import { OrdersService } from './orders.service.js';
 //
 // Coordinen entre ustedes: ambos editan este archivo (hagan commits pequeños).
 // =============================================================================
-
+@ApiTags('orders')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
-
+  @ApiOperation({
+    summary: 'la lista de todas las ordenes',
+    description: 'obtiene la lista de las ordenes ',
+  })
   @Get()
   findAll() {
     return this.ordersService.findAll();
@@ -41,16 +45,28 @@ export class OrdersController {
 
   // Esta ruta se declara ANTES de ':id' para que se lea de lo más específico
   // a lo más genérico.
+  @ApiOperation({
+    summary: 'hace una consulta pesas ',
+    description: 'tiempo estomado del reporte 4 segundos',
+  })
   @Get('reports/heavy-process')
   generateHeavyReport() {
     return this.ordersService.generateHeavyReport();
   }
-
+  @ApiOperation({
+    summary: 'obtiene las odenes segun id ',
+    description: 'segun el id que se ponga se traera el id con esa id',
+  })
+  @ApiParam({ name: 'id', description: 'el id del la orden', example: 1 })
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.findOne(id);
   }
-
+  @ApiOperation({
+    summary: 'crea una nueva orden',
+    description: 'crea una nueva orden',
+  })
+  @ApiParam({ name: 'id', description: 'el id del la orden', example: 1 })
   @Post()
   create(@Body() dto: CreateOrderDto) {
     return this.ordersService.create(dto);
