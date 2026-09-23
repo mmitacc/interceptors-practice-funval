@@ -50,7 +50,7 @@ export class OrdersController {
   })
   @Get()
   @ApiOkResponse({
-    type: Order,
+    type: [Order],
   })
   findAll() {
     return this.ordersService.findAll();
@@ -63,7 +63,9 @@ export class OrdersController {
     description: 'tiempo estomado del reporte 4 segundos',
   })
   @Get('reports/heavy-process')
-  @ApiRequestTimeoutResponse()
+  @ApiRequestTimeoutResponse({
+    description: 'La petición excedió el tiempo límite de 3000 ms',
+  })
   generateHeavyReport() {
     return this.ordersService.generateHeavyReport();
   }
@@ -76,7 +78,7 @@ export class OrdersController {
   @ApiOkResponse({
     type: Order,
   })
-  @ApiNotFoundResponse()
+  @ApiNotFoundResponse({ description: 'Pedido no encontrado' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.findOne(id);
   }
@@ -87,7 +89,7 @@ export class OrdersController {
   @ApiParam({ name: 'id', description: 'el id del la orden', example: 1 })
   @Post()
   @ApiCreatedResponse({ type: Order })
-  @ApiBadRequestResponse()
+  @ApiBadRequestResponse({ description: 'Datos inválidos' })
   create(@Body() dto: CreateOrderDto) {
     return this.ordersService.create(dto);
   }
