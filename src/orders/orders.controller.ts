@@ -8,7 +8,17 @@ import {
 } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { OrdersService } from './orders.service.js';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiRequestTimeoutResponse,
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+} from '@nestjs/swagger';
+import { Order } from './entities/order.entity.js';
 
 // =============================================================================
 // OrdersController
@@ -39,6 +49,9 @@ export class OrdersController {
     description: 'obtiene la lista de las ordenes ',
   })
   @Get()
+  @ApiOkResponse({
+    type: Order,
+  })
   findAll() {
     return this.ordersService.findAll();
   }
@@ -50,6 +63,7 @@ export class OrdersController {
     description: 'tiempo estomado del reporte 4 segundos',
   })
   @Get('reports/heavy-process')
+  @ApiRequestTimeoutResponse()
   generateHeavyReport() {
     return this.ordersService.generateHeavyReport();
   }
@@ -59,6 +73,10 @@ export class OrdersController {
   })
   @ApiParam({ name: 'id', description: 'el id del la orden', example: 1 })
   @Get(':id')
+  @ApiOkResponse({
+    type: Order,
+  })
+  @ApiNotFoundResponse()
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.findOne(id);
   }
@@ -68,6 +86,8 @@ export class OrdersController {
   })
   @ApiParam({ name: 'id', description: 'el id del la orden', example: 1 })
   @Post()
+  @ApiCreatedResponse({ type: Order })
+  @ApiBadRequestResponse()
   create(@Body() dto: CreateOrderDto) {
     return this.ordersService.create(dto);
   }

@@ -39,7 +39,7 @@ export function maskCreditCard(value: string): string {
   //   caracteres. Pista: value.slice(-4)
 
   // ⬇️ Reemplaza esta línea por tu implementación.
-  return value;
+  return '**** **** **** ' + value.slice(-4);
 }
 
 /**
@@ -62,6 +62,26 @@ export function sanitize(value: unknown): unknown {
   //   reales. Los tests lo verifican.
 
   // ⬇️ Reemplaza esta línea por tu implementación.
+  if (Array.isArray(value)) return value.map(sanitize);
+  if (value instanceof Date) return value;
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    !(value instanceof Date)
+  ) {
+    const newObject: Record<string, any> = {};
+    for (const [llave, valor] of Object.entries(value)) {
+      if (REMOVED_FIELDS.includes(llave)) continue;
+      if (MASKED_FIELDS.includes(llave)) {
+        newObject[llave] = maskCreditCard(valor);
+      } else {
+        newObject[llave] = sanitize(valor);
+      }
+    }
+    value = newObject;
+    return value;
+  }
   return value;
 }
 
@@ -72,6 +92,6 @@ export class SanitizeInterceptor implements NestInterceptor {
     //   next.handle().pipe( map((data) => sanitize(data)) )
 
     // ⬇️ Reemplaza esta línea por tu implementación.
-    return next.handle();
+    return next.handle().pipe(map((data) => sanitize(data)));
   }
 }

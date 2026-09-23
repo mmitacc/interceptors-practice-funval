@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -27,36 +28,56 @@ import {
 // =============================================================================
 
 export class OrderItemDto {
+  @ApiProperty({ description: 'ID del producto', example: 102 })
   @IsInt()
   @IsPositive()
   productId: number;
 
+  @ApiProperty({
+    description: 'Nombre del producto',
+    example: 'Teclado inalambrico',
+  })
   @IsString()
   @IsNotEmpty()
   productName: string;
 
+  @ApiProperty({ description: 'Cantidad de productos', example: 2, minimum: 1 })
   @IsInt()
   @Min(1)
   quantity: number;
 
+  @ApiProperty({ description: 'Precio unitario del producto', example: 159.9 })
   @IsPositive()
   unitPrice: number;
 }
 
 export class CreateOrderDto {
+  @ApiProperty({ description: 'Nombre del cliente', example: 'Juan Perez' })
   @IsString()
   @IsNotEmpty()
   customerName: string;
 
+  @ApiProperty({ description: 'Email del cliente', example: 'juan@mail.com' })
   @IsEmail()
   customerEmail: string;
 
+  @ApiProperty({
+    description: 'Lista array de objetos de los productos',
+    example: [{}, {}],
+    type: [OrderItemDto],
+    minItems: 1,
+  })
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
   items: OrderItemDto[];
 
+  @ApiProperty({
+    description: 'Número de Tarjeta de Crédito',
+    example: '**** **** **** 4242',
+    pattern: '/^\d{16}$/',
+  })
   @Matches(/^\d{16}$/, {
     message: 'creditCard debe tener exactamente 16 dígitos numéricos',
   })
